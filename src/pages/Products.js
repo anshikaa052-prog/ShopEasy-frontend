@@ -13,7 +13,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch('http://https://shopeasy-backend-4thj.onrender.com/api/products');
       const data = await res.json();
       setProducts(data);
       setLoading(false);
@@ -43,7 +43,7 @@ const Products = () => {
   const deleteHandler = async (id) => {
     if (window.confirm('Kya tu pakka is product ko delete karna chahta hai?')) {
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+        const res = await fetch(`http://https://shopeasy-backend-4thj.onrender.com/api/products/${id}`, {
           method: 'DELETE',
         });
         
@@ -96,7 +96,7 @@ const Products = () => {
                 justifyContent: 'center'
               }}>
                 <img
-                  src={`http://localhost:5000${product.image}`}
+                  src={`http://https://shopeasy-backend-4thj.onrender.com${product.image}`}
                   alt={product.name}
                   width="210"
                   height="210"
