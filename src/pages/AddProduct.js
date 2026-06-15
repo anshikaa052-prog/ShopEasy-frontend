@@ -23,7 +23,7 @@ const AddProduct = () => {
     formData.append('image', image);
 
     try {
-      await axios.post('http://https://shopeasy-backend-4thj.onrender.com/api/products', formData);
+      await axios.post('https://shopeasy-backend-4thj.onrender.com/api/products', formData);
       alert('Product added successfully!');
       navigate('/');
     } catch (error) {

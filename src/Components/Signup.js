@@ -35,7 +35,7 @@ const handleSubmit = async(e) => {
   else {
     setErrors({});
   try {
-    const {data} = await axios.post('http://https://shopeasy-backend-4thj.onrender.com/api/users/Signup',
+    const {data} = await axios.post('https://shopeasy-backend-4thj.onrender.com/api/users/Signup',
       {
         name,
         email,

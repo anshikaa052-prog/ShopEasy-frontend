@@ -38,7 +38,7 @@ const ShippingScreen = () => {
     try {
       
       await axios.put(
-        'http://https://shopeasy-backend-4thj.onrender.com/api/users/shipping', // Ye tera backend route hai
+        'https://shopeasy-backend-4thj.onrender.com/api/users/shipping', // Ye tera backend route hai
         shippingData,
         {
           headers: { Authorization: `Bearer ${userInfo.token}` }

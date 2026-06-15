@@ -16,7 +16,7 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const { data } = await axios.post('http://https://shopeasy-backend-4thj.onrender.com/api/users/login', {
+      const { data } = await axios.post('https://shopeasy-backend-4thj.onrender.com/api/users/login', {
         email,
         password,
       });
