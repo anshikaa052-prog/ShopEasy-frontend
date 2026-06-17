@@ -96,7 +96,7 @@ const Products = () => {
                 justifyContent: 'center'
               }}>
                 <img
-                  src={`https://shopeasy-backend-4thj.onrender.com${product.image}`}
+                  src={product.image}
                   alt={product.name}
                   width="210"
                   height="210"
