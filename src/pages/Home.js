@@ -81,7 +81,7 @@ const Home = () => {
                 <div className="col-md-3 mb-4" key={product._id}>
                   <div className="card h-100 shadow-sm">
                     <img
-                      src={`https://shopeasy-backend-4thj.onrender.com${product.image}`}
+                      src={product.image}
                       className="card-img-top"
                       alt={product.name}
                       style={{ height: '200px', objectFit: 'contain' }}
