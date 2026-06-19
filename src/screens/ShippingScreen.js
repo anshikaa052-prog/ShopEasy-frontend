@@ -26,32 +26,32 @@ const ShippingScreen = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    
+    if (!userInfo || !userInfo.token) {
+      navigate('/login?redirect=/shipping');
+      return;
+    }
+
     setLoading(true);
     
     const shippingData = { address, city, postalCode, country };
-
-    
     setShippingAddress(shippingData);
-    
     localStorage.setItem('shippingAddress', JSON.stringify(shippingData));
 
     try {
-      
       await axios.put(
-        'https://shopeasy-backend-4thj.onrender.com/api/users/shipping', // Ye tera backend route hai
+        'https://shopeasy-backend-4thj.onrender.com/api/users/shipping', 
         shippingData,
         {
           headers: { Authorization: `Bearer ${userInfo.token}` }
         }
       );
-      
-      setLoading(false);
-      navigate('/payment'); // Sab ho gaya toh payment page pe bhej do
-      
     } catch (error) {
-      setLoading(false);
-      alert(error.response?.data?.message || 'Address save nahi hua');
+      console.log('Backend save failed but continuing:', error.response?.status);
     }
+    
+    setLoading(false);
+    navigate('/payment'); 
   };
 
   return (

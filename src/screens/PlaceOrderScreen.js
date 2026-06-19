@@ -1,3 +1,4 @@
+const API_URL = 'https://shopeasy-backend-4thj.onrender.com'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +13,6 @@ const PlaceOrderScreen = () => {
   const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
   const shippingAddress = JSON.parse(localStorage.getItem('shippingAddress'));
 
-  // Redirect agar login nahi hai - cart wala check hata diya
   useEffect(() => {
     if (!userInfo) {
       navigate('/login');
@@ -20,13 +20,13 @@ const PlaceOrderScreen = () => {
     if (!shippingAddress) {
       navigate('/shipping');
     }
-    // Cart wala check yahan se hata diya, warna order ke baad redirect ho jayega
+    
     if (cartItems.length === 0 && !orderPlaced) {
       navigate('/cart');
     }
   }, [userInfo, shippingAddress, cartItems, navigate, orderPlaced]);
 
-  // Price calculation
+  
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const shippingPrice = itemsPrice > 500 ? 0 : 50;
   const taxPrice = Number((0.18 * itemsPrice).toFixed(2));
@@ -46,7 +46,7 @@ const PlaceOrderScreen = () => {
         },
       };
 
-      const { data } = await axios.post('/api/orders', {
+      const { data } = await axios.post('${API_URL}/api/orders', {
         orderItems: cartItems.map(item => ({
           name: item.name,
           qty: item.qty,
