@@ -1,8 +1,8 @@
-const API_URL = 'https://shopeasy-backend-4thj.onrender.com'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = 'https://shopeasy-backend-4thj.onrender.com'
 const PlaceOrderScreen = () => {
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [loading, setLoading] = useState(false);
