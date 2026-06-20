@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://shopeasy-backend-4thj.onrender.com'
+// Line 4: Env variable use karo ya direct URL
+const API_URL = process.env.REACT_APP_API_URL || 'https://shopeasy-backend-4thj.onrender.com'
+
 const PlaceOrderScreen = () => {
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [loading, setLoading] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false); // Naya flag
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const navigate = useNavigate();
   
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -33,8 +35,8 @@ const PlaceOrderScreen = () => {
   const totalPrice = itemsPrice + shippingPrice + taxPrice;
 
   const placeOrderHandler = async (e) => {
-    e.preventDefault(); // Form submit rokne ke liye
-    if (loading) return; // Double click roko
+    e.preventDefault();
+    if (loading) return;
     
     setLoading(true);
     
@@ -46,7 +48,8 @@ const PlaceOrderScreen = () => {
         },
       };
 
-      const { data } = await axios.post('${API_URL}/api/orders', {
+      // YAHAN BACKTICKS USE KIYE - YE MAIN FIX HAI
+      const { data } = await axios.post(`${API_URL}/api/orders`, {
         orderItems: cartItems.map(item => ({
           name: item.name,
           qty: item.qty,
@@ -63,10 +66,10 @@ const PlaceOrderScreen = () => {
       }, config);
 
       console.log('Order Success:', data);
-      setOrderPlaced(true); // Flag set kar do taaki cart check na ho
+      setOrderPlaced(true);
       localStorage.removeItem('cartItems'); 
       setLoading(false);
-      navigate(`/order/${data._id}`); // Ab ye chalega
+      navigate(`/order/${data._id}`);
     } catch (error) {
       setLoading(false);
       console.log('Order Error:', error.response?.data?.message || error.message);
@@ -90,7 +93,7 @@ const PlaceOrderScreen = () => {
 
             <div style={{ marginBottom: '25px' }}>
               <h2 style={{ fontSize: '18px', marginBottom: '10px' }}>Payment Method</h2>
-              <div> {/* form tag hata diya */}
+              <div>
                 <label style={{ display: 'flex', alignItems: 'center', padding: '15px', border: '1px solid #cbd5e0', borderRadius: '8px', marginBottom: '10px', cursor: 'pointer' }}>
                   <input
                     type="radio"
@@ -158,7 +161,7 @@ const PlaceOrderScreen = () => {
               </div>
 
               <button
-                type="button" // type="submit" se "button" kar diya
+                type="button"
                 onClick={placeOrderHandler}
                 disabled={cartItems.length === 0 || loading}
                 style={{
