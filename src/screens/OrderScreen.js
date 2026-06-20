@@ -1,16 +1,139 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
+import axios from 'axios'
+import { UserContext } from '../App'
+import Message from '../components/Message'
+import Loader from '../components/Loader'
 
 const OrderScreen = () => {
-  const { id } = useParams();
-  
-  return (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
-      <h1>Order Placed Successfully! 🎉</h1>
-      <p>Your Order ID: {id}</p>
-      <p>Thank you for shopping with us</p>
-    </div>
-  );
-};
+  const { id } = useParams()
+  const { userInfo } = useContext(UserContext)
 
-export default OrderScreen;
+  const [order, setOrder] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        }
+        const { data } = await axios.get(
+          `https://shopeasy-backend-4thj.onrender.com/api/orders/${id}`,
+          config
+        )
+        setOrder(data)
+        setLoading(false)
+      } catch (err) {
+        setError(
+          err.response && err.response.data.message
+            ? err.response.data.message
+            : err.message
+        )
+        setLoading(false)
+      }
+    }
+
+    if (userInfo && userInfo.token) {
+      fetchOrder()
+    } else {
+      setError('Not authorized. Please login')
+      setLoading(false)
+    }
+  }, [id, userInfo])
+
+  return loading ? (
+    <Loader />
+  ) : error ? (
+    <Message variant='danger'>{error}</Message>
+  ) : !order ? (
+    <Message>Order not found</Message>
+  ) : (
+    <>
+      <h1>Order {order._id}</h1>
+      <Row>
+        <Col md={8}>
+          <ListGroup variant='flush'>
+            <ListGroup.Item>
+              <h2>Shipping</h2>
+              <p><strong>Name: </strong> {order.user.name}</p>
+              <p><strong>Email: </strong>
+                <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
+              </p>
+              <p>
+                <strong>Address: </strong>
+                {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
+                {order.shippingAddress.postalCode}, {order.shippingAddress.country}
+              </p>
+              {order.isDelivered ? (
+                <Message variant='success'>Delivered on {order.deliveredAt}</Message>
+              ) : (
+                <Message variant='danger'>Not Delivered</Message>
+              )}
+            </ListGroup.Item>
+
+            <ListGroup.Item>
+              <h2>Payment Method</h2>
+              <p><strong>Method: </strong>{order.paymentMethod}</p>
+              {order.isPaid ? (
+                <Message variant='success'>Paid on {order.paidAt}</Message>
+              ) : (
+                <Message variant='danger'>Not Paid</Message>
+              )}
+            </ListGroup.Item>
+
+            <ListGroup.Item>
+              <h2>Order Items</h2>
+              {order.orderItems.length === 0 ? (
+                <Message>Order is empty</Message>
+              ) : (
+                <ListGroup variant='flush'>
+                  {order.orderItems.map((item, index) => (
+                    <ListGroup.Item key={index}>
+                      <Row>
+                        <Col md={1}>
+                          <Image src={item.image} alt={item.name} fluid rounded />
+                        </Col>
+                        <Col>
+                          <Link to={`/product/${item.product}`}>{item.name}</Link>
+                        </Col>
+                        <Col md={4}>
+                          {item.qty} x ₹{item.price} = ₹{(item.qty * item.price).toFixed(2)}
+                        </Col>
+                      </Row>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              )}
+            </ListGroup.Item>
+          </ListGroup>
+        </Col>
+        <Col md={4}>
+          <Card>
+            <ListGroup variant='flush'>
+              <ListGroup.Item><h2>Order Summary</h2></ListGroup.Item>
+              <ListGroup.Item>
+                <Row><Col>Items</Col><Col>₹{order.itemsPrice}</Col></Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <Row><Col>Shipping</Col><Col>₹{order.shippingPrice}</Col></Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <Row><Col>Tax</Col><Col>₹{order.taxPrice}</Col></Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <Row><Col>Total</Col><Col>₹{order.totalPrice}</Col></Row>
+              </ListGroup.Item>
+            </ListGroup>
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )
+}
+
+export default OrderScreen
