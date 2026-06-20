@@ -11,6 +11,7 @@ import ShippingScreen from './screens/ShippingScreen';
 import PaymentScreen from './screens/PaymentScreen';
 import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
+import MyOrdersPage from './pages/MyOrdersPage';
 
 export const CartContext = createContext();
 export const UserContext = createContext();
@@ -53,6 +54,7 @@ function App() {
               <Route path="/payment" element={<PaymentScreen />} />
               <Route path="/placeorder" element={<PlaceOrderScreen />} />
               <Route path='/order/:id' element={<OrderScreen />} />
+              <Route path="/myorders" element={<MyOrdersPage />} />
             </Routes>
           </>
         </BrowserRouter>

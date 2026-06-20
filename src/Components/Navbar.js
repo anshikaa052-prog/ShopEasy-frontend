@@ -53,6 +53,13 @@ const Navbar = () => {
 
               {userInfo ? (
                 <>
+                  {/* ✅ YAHAN ADD KAR - Login ke baad dikhega */}
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/myorders">
+                      My Orders
+                    </Link>
+                  </li>
+                  
                   <li className="nav-item">
                     <span className="nav-link text-white">
                       Hi, {userInfo.name}
