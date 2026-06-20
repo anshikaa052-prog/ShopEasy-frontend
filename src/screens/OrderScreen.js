@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
-import axios from 'axios'
+import { useParams } from 'react-router-dom'
 import { UserContext } from '../App'
-import Message from '../components/Message'
-import Loader from '../components/Loader'
+import axios from 'axios'
 
 const OrderScreen = () => {
-  const { id } = useParams()
-  const { userInfo } = useContext(UserContext)
-
+  const { id: orderId } = useParams()
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState('')
+
+  const { userInfo } = useContext(UserContext)
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -23,116 +20,87 @@ const OrderScreen = () => {
           },
         }
         const { data } = await axios.get(
-          `https://shopeasy-backend-4thj.onrender.com/api/orders/${id}`,
+          `https://shopeasy-backend-4jhj.onrender.com/api/orders/${orderId}`,
           config
         )
         setOrder(data)
         setLoading(false)
       } catch (err) {
-        setError(
-          err.response && err.response.data.message
-            ? err.response.data.message
-            : err.message
-        )
+        setError(err.response?.data?.message || err.message)
         setLoading(false)
       }
     }
 
-    if (userInfo && userInfo.token) {
+    if (userInfo) {
       fetchOrder()
     } else {
-      setError('Not authorized. Please login')
+      setError('Please login to view order')
       setLoading(false)
     }
-  }, [id, userInfo])
+  }, [orderId, userInfo])
 
-  return loading ? (
-    <Loader />
-  ) : error ? (
-    <Message variant='danger'>{error}</Message>
-  ) : !order ? (
-    <Message>Order not found</Message>
-  ) : (
-    <>
-      <h1>Order {order._id}</h1>
-      <Row>
-        <Col md={8}>
-          <ListGroup variant='flush'>
-            <ListGroup.Item>
-              <h2>Shipping</h2>
-              <p><strong>Name: </strong> {order.user.name}</p>
-              <p><strong>Email: </strong>
-                <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
-              </p>
-              <p>
-                <strong>Address: </strong>
-                {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
-                {order.shippingAddress.postalCode}, {order.shippingAddress.country}
-              </p>
-              {order.isDelivered ? (
-                <Message variant='success'>Delivered on {order.deliveredAt}</Message>
-              ) : (
-                <Message variant='danger'>Not Delivered</Message>
-              )}
-            </ListGroup.Item>
+  return (
+    <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}>
+      <h1>Order {orderId}</h1>
+      
+      {loading ? (
+        <h3>Loading...</h3>
+      ) : error ? (
+        <div style={{ color: 'red', padding: '15px', border: '1px solid red', borderRadius: '5px' }}>
+          {error}
+        </div>
+      ) : (
+        <div>
+          <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
+            <h2>Shipping</h2>
+            <p><strong>Name:</strong> {order.user.name}</p>
+            <p><strong>Email:</strong> {order.user.email}</p>
+            <p>
+              <strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city} {order.shippingAddress.postalCode}, {order.shippingAddress.country}
+            </p>
+            {order.isDelivered ? (
+              <div style={{ color: 'green', fontWeight: 'bold' }}>Delivered on {order.deliveredAt}</div>
+            ) : (
+              <div style={{ color: 'red', fontWeight: 'bold' }}>Not Delivered</div>
+            )}
+          </div>
 
-            <ListGroup.Item>
-              <h2>Payment Method</h2>
-              <p><strong>Method: </strong>{order.paymentMethod}</p>
-              {order.isPaid ? (
-                <Message variant='success'>Paid on {order.paidAt}</Message>
-              ) : (
-                <Message variant='danger'>Not Paid</Message>
-              )}
-            </ListGroup.Item>
+          <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
+            <h2>Payment Method</h2>
+            <p><strong>Method:</strong> {order.paymentMethod}</p>
+            {order.isPaid ? (
+              <div style={{ color: 'green', fontWeight: 'bold' }}>Paid on {order.paidAt}</div>
+            ) : (
+              <div style={{ color: 'red', fontWeight: 'bold' }}>Not Paid</div>
+            )}
+          </div>
 
-            <ListGroup.Item>
-              <h2>Order Items</h2>
-              {order.orderItems.length === 0 ? (
-                <Message>Order is empty</Message>
-              ) : (
-                <ListGroup variant='flush'>
-                  {order.orderItems.map((item, index) => (
-                    <ListGroup.Item key={index}>
-                      <Row>
-                        <Col md={1}>
-                          <Image src={item.image} alt={item.name} fluid rounded />
-                        </Col>
-                        <Col>
-                          <Link to={`/product/${item.product}`}>{item.name}</Link>
-                        </Col>
-                        <Col md={4}>
-                          {item.qty} x ₹{item.price} = ₹{(item.qty * item.price).toFixed(2)}
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )}
-            </ListGroup.Item>
-          </ListGroup>
-        </Col>
-        <Col md={4}>
-          <Card>
-            <ListGroup variant='flush'>
-              <ListGroup.Item><h2>Order Summary</h2></ListGroup.Item>
-              <ListGroup.Item>
-                <Row><Col>Items</Col><Col>₹{order.itemsPrice}</Col></Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row><Col>Shipping</Col><Col>₹{order.shippingPrice}</Col></Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row><Col>Tax</Col><Col>₹{order.taxPrice}</Col></Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row><Col>Total</Col><Col>₹{order.totalPrice}</Col></Row>
-              </ListGroup.Item>
-            </ListGroup>
-          </Card>
-        </Col>
-      </Row>
-    </>
+          <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
+            <h2>Order Items</h2>
+            {order.orderItems.length === 0 ? (
+              <div>Order is empty</div>
+            ) : (
+              <div>
+                {order.orderItems.map((item, index) => (
+                  <div key={index} style={{ borderBottom: '1px solid #eee', padding: '10px 0' }}>
+                    <p><strong>{item.name}</strong></p>
+                    <p>{item.qty} x ${item.price} = ${(item.qty * item.price).toFixed(2)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
+            <h2>Order Summary</h2>
+            <p><strong>Items:</strong> ${order.itemsPrice}</p>
+            <p><strong>Shipping:</strong> ${order.shippingPrice}</p>
+            <p><strong>Tax:</strong> ${order.taxPrice}</p>
+            <p style={{ fontSize: '20px' }}><strong>Total:</strong> ${order.totalPrice}</p>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
