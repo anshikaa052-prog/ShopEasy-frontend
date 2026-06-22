@@ -14,6 +14,10 @@ const OrderScreen = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
+        console.log("UserInfo:", userInfo);
+        console.log("Token:",userInfo?.token);
+        console.log("Order ID:", orderId);
+
         const config = {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
@@ -26,6 +30,8 @@ const OrderScreen = () => {
         setOrder(data)
         setLoading(false)
       } catch (err) {
+        console.log("FULL ERROR:", err);
+        console.log("RESPONSE:",err.response);
         setError(err.response?.data?.message || err.message)
         setLoading(false)
       }
