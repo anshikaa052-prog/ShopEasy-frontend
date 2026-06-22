@@ -80,12 +80,12 @@ const MyOrdersPage = () => {
                   </p>
                 </div>
               </div>
-              <Link 
+              {/* <Link 
                 to={`/order/${order._id}`} 
                 className="text-blue-500 hover:underline font-medium"
               >
                 View Order Details →
-              </Link>
+              </Link> */}
             </div>
           ))}
         </div>
